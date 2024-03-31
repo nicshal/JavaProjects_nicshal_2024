@@ -3,17 +3,19 @@ package ru.nicshal.chat.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
 
-    private int port;
-    private List<ClientHandler> clients;
+    private final int port;
+    private final Map<String, ClientHandler> clients;
+    private final Object monitor;
 
     public Server(int port) {
         this.port = port;
-        this.clients = new ArrayList<>();
+        this.clients = new HashMap<>();
+        this.monitor = this;
     }
 
     public void start() {
@@ -28,24 +30,30 @@ public class Server {
         }
     }
 
-    public synchronized void subscribe(ClientHandler clientHandler) {
-        clients.add(clientHandler);
-    }
-
-    public synchronized void unsubscribe(ClientHandler clientHandler) {
-        clients.remove(clientHandler);
-    }
-
-    public synchronized void broadcastMessage(String message) {
-        for (ClientHandler c : clients) {
-            c.sendMessage(message);
+    public void subscribe(ClientHandler clientHandler) {
+        synchronized (monitor) {
+            clients.put(clientHandler.getUsername(), clientHandler);
         }
     }
 
-    public synchronized void individualMessage(String client, String message) {
-        for (ClientHandler c : clients) {
-            if (c.getUsername().equals(client)) {
+    public void unsubscribe(ClientHandler clientHandler) {
+        synchronized (monitor) {
+            clients.remove(clientHandler.getUsername());
+        }
+    }
+
+    public void broadcastMessage(String message) {
+        synchronized (monitor) {
+            for (ClientHandler c : clients.values()) {
                 c.sendMessage(message);
+            }
+        }
+    }
+
+    public void individualMessage(String client, String message) {
+        synchronized (monitor) {
+            if (clients.containsKey(client)) {
+                clients.get(client).sendMessage(message);
             }
         }
     }
