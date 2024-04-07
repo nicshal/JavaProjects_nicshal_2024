@@ -10,6 +10,7 @@ public class ClientApplication {
 
     public final static String IP_ADDRESS = "127.0.0.1";
     public final static int PORT_NUMBER = 9090;
+    public static boolean isEnable = true;
 
     public static void main(String[] args) {
         try (Socket socket = new Socket(IP_ADDRESS, PORT_NUMBER);
@@ -18,15 +19,14 @@ public class ClientApplication {
             System.out.println("Подключились к серверу");
             Thread thread = createThread(in);
             thread.start();
-            startCommunication(out, thread);
+            startCommunication(out);
             thread.join();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private static void startCommunication(DataOutputStream out, Thread thread) throws IOException, InterruptedException {
-        boolean isEnable = true;
+    private static void startCommunication(DataOutputStream out) throws IOException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
         while (isEnable) {
             String request = scanner.nextLine();
@@ -40,12 +40,11 @@ public class ClientApplication {
     private static Thread createThread(DataInputStream in) {
         return new Thread(() -> {
             try {
-                boolean isEnableThread = true;
-                while (isEnableThread) {
+                while (isEnable) {
                     String msg = in.readUTF();
                     System.out.println(msg);
                     if (msg.endsWith("stop")) {
-                        isEnableThread = false;
+                        isEnable = false;
                     }
                 }
             } catch (IOException e) {

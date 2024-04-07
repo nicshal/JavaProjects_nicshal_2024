@@ -10,20 +10,31 @@ public class Server {
 
     private final int port;
     private final Map<String, ClientHandler> clients;
+    private final AuthenticationService authenticationService;
     private final Object monitor;
 
     public Server(int port) {
         this.port = port;
         this.clients = new HashMap<>();
         this.monitor = this;
+        this.authenticationService = new InMemoryAuthenticationService();
+    }
+
+    public AuthenticationService getAuthenticationService() {
+        return authenticationService;
     }
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.printf("Сервер запущен на порту: %d, ожидаем подключения клиентов\n", port);
+            System.out.println("Сервис аутентификации запущен: " + authenticationService.getClass().getSimpleName());
             while (true) {
-                Socket socket = serverSocket.accept();
-                subscribe(ClientHandler.createClientHandler(this, socket));
+                try {
+                    Socket socket = serverSocket.accept();
+                    ClientHandler.createClientHandler(this, socket);
+                } catch (Exception e) {
+                    System.out.println("Возникла ошибка при обработке подключившегося клиента");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -32,13 +43,27 @@ public class Server {
 
     public void subscribe(ClientHandler clientHandler) {
         synchronized (monitor) {
-            clients.put(clientHandler.getUsername(), clientHandler);
+            broadcastMessage("К чату присоединился " + clientHandler.getNickname());
+            clients.put(clientHandler.getNickname(), clientHandler);
         }
     }
 
     public void unsubscribe(ClientHandler clientHandler) {
         synchronized (monitor) {
-            clients.remove(clientHandler.getUsername());
+            clients.remove(clientHandler.getNickname());
+            broadcastMessage("Из чата вышел " + clientHandler.getNickname());
+        }
+    }
+
+    public void disconnectClient(String nickname) {
+        synchronized (monitor) {
+            if (clients.containsKey(nickname)) {
+                clients.get(nickname).setEnable(false);
+                individualMessage(nickname, "Вы будете отключены от чата");
+                individualMessage(nickname, "stop");
+                clients.remove(nickname);
+                broadcastMessage("От чата отключен " + nickname);
+            }
         }
     }
 
@@ -50,11 +75,17 @@ public class Server {
         }
     }
 
-    public void individualMessage(String client, String message) {
+    public void individualMessage(String nickname, String message) {
         synchronized (monitor) {
-            if (clients.containsKey(client)) {
-                clients.get(client).sendMessage(message);
+            if (clients.containsKey(nickname)) {
+                clients.get(nickname).sendMessage(message);
             }
+        }
+    }
+
+    public boolean isNicknameActive(String nickname) {
+        synchronized (monitor) {
+            return clients.containsKey(nickname);
         }
     }
 
