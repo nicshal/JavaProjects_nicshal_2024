@@ -1,5 +1,10 @@
 package ru.nicshal.chat.server;
 
+import ru.nicshal.chat.server.authentication.AuthenticationService;
+import ru.nicshal.chat.server.authentication.DatabaseAuthenticationService;
+//import ru.nicshal.chat.server.authentication.InMemoryAuthenticationService;
+import ru.nicshal.chat.server.handlers.ClientHandler;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,7 +22,8 @@ public class Server {
         this.port = port;
         this.clients = new HashMap<>();
         this.monitor = this;
-        this.authenticationService = new InMemoryAuthenticationService();
+        //this.authenticationService = new InMemoryAuthenticationService();
+        this.authenticationService = new DatabaseAuthenticationService();
     }
 
     public AuthenticationService getAuthenticationService() {

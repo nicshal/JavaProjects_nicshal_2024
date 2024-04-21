@@ -1,4 +1,6 @@
-package ru.nicshal.chat.server;
+package ru.nicshal.chat.server.handlers;
+
+import ru.nicshal.chat.server.Server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
