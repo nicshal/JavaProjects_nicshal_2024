@@ -1,4 +1,4 @@
-package ru.nicshal.chat.server;
+package ru.nicshal.chat.server.authentication;
 
 import java.util.ArrayList;
 import java.util.List;

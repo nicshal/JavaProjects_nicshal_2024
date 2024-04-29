@@ -1,4 +1,4 @@
-package ru.nicshal.chat.server;
+package ru.nicshal.chat.server.authentication;
 
 public interface AuthenticationService {
 
