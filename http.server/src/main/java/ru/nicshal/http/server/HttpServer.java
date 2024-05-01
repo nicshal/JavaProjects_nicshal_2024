@@ -5,15 +5,19 @@ import ru.nicshal.http.server.handlers.HttpRequestHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HttpServer {
 
     private final int port;
     private final Dispatcher dispatcher;
+    private final ExecutorService executorService;
 
-    public HttpServer(int port) {
+    public HttpServer(int port, int threadCount) {
         this.port = port;
         this.dispatcher = new Dispatcher();
+        this.executorService = Executors.newFixedThreadPool(threadCount);
     }
 
     public void start() {
@@ -23,7 +27,7 @@ public class HttpServer {
             while (true) {
                 try {
                     Socket socket = serverSocket.accept();
-                    HttpRequestHandler.executeHttpRequestHandler(this, socket);
+                    executeHttpRequestHandler(socket);
                 } catch (Exception e) {
                     System.out.println("Возникла ошибка при обработке нового подключения");
                 }
@@ -35,6 +39,11 @@ public class HttpServer {
 
     public Dispatcher getDispatcher() {
         return dispatcher;
+    }
+
+    private void executeHttpRequestHandler(Socket socket) throws IOException {
+        HttpRequestHandler httpRequestHandler = new HttpRequestHandler(this, socket);
+        executorService.execute(httpRequestHandler);
     }
 
 }
