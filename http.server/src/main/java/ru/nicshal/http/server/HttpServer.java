@@ -1,6 +1,10 @@
 package ru.nicshal.http.server;
 
+import ru.nicshal.http.server.data.Storage;
 import ru.nicshal.http.server.handlers.HttpRequestHandler;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,6 +14,7 @@ import java.util.concurrent.Executors;
 
 public class HttpServer {
 
+    private final Logger logger = LogManager.getLogger(HttpServer.class.getName());
     private final int port;
     private final Dispatcher dispatcher;
     private final ExecutorService executorService;
@@ -22,14 +27,14 @@ public class HttpServer {
 
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Сервер запущен на порту: " + port);
-            System.out.println("Диспетчер проинициализирован");
+            Storage.init();
+            logger.info("Сервер запущен на порту: " + port);
             while (true) {
                 try {
                     Socket socket = serverSocket.accept();
                     executeHttpRequestHandler(socket);
                 } catch (Exception e) {
-                    System.out.println("Возникла ошибка при обработке нового подключения");
+                    logger.error("Возникла ошибка при обработке нового подключения");
                 }
             }
         } catch (IOException e) {
