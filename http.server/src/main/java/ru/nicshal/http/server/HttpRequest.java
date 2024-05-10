@@ -32,7 +32,7 @@ public class HttpRequest {
     }
 
     public String getParameter(String key) {
-        return parameters.get(key);
+        return parameters.getOrDefault(key, null);
     }
 
     public String getBody() {
