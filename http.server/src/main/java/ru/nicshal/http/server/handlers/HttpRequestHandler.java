@@ -1,5 +1,7 @@
 package ru.nicshal.http.server.handlers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.nicshal.http.server.HttpRequest;
 import ru.nicshal.http.server.HttpServer;
 
@@ -8,6 +10,7 @@ import java.net.Socket;
 
 public class HttpRequestHandler implements Runnable {
 
+    private final Logger logger = LogManager.getLogger(HttpRequestHandler.class.getName());
     private final HttpServer server;
     private final Socket socket;
 
@@ -21,7 +24,7 @@ public class HttpRequestHandler implements Runnable {
         try (InputStream in = socket.getInputStream();
              OutputStream out = socket.getOutputStream();
              this.socket;) {
-            System.out.println("Новое подключение");
+            logger.info("Новое подключение");
             byte[] buffer = new byte[8192];
             int n = in.read(buffer);
             if (n > 0) {
