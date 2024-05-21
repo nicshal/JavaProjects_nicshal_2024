@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class StorageProductRepositoryImpl implements ProductRepository {
 
-    private final Logger logger = LogManager.getLogger(PostgresProductRepositoryImpl.class.getName());
+    private final Logger logger = LogManager.getLogger(StorageProductRepositoryImpl.class.getName());
     private List<Item> items;
 
     public void init() {
