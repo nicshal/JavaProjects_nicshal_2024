@@ -1,6 +1,7 @@
 package ru.nicshal.http.server.processors;
 
 import ru.nicshal.http.server.HttpRequest;
+import ru.nicshal.http.server.repositories.ProductRepository;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 public class CalculatorRequestProcessor implements RequestProcessor {
 
     @Override
-    public void execute(HttpRequest httpRequest, OutputStream output) throws IOException {
+    public void execute(HttpRequest httpRequest, OutputStream output, ProductRepository productRepository) throws IOException {
         int a = Integer.parseInt(httpRequest.getParameter("a"));
         int b = Integer.parseInt(httpRequest.getParameter("b"));
         int result = a + b;

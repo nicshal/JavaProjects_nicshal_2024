@@ -1,12 +1,11 @@
 package ru.nicshal.http.server;
 
+import static ru.nicshal.http.server.utils.ApplicationConst.*;
+
 public class ServerApplication {
 
-    public static final int PORT_NUMBER = 8189;
-    private static final int THREAD_COUNT = 10;
-
     public static void main(String[] args) {
-        new HttpServer(PORT_NUMBER, THREAD_COUNT).start();
+        new HttpServer(PORT_NUMBER, THREAD_COUNT, REPOSITORY_TYPE).start();
     }
 
 }

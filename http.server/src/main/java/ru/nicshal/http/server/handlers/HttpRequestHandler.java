@@ -31,7 +31,7 @@ public class HttpRequestHandler implements Runnable {
                 String rawRequest = new String(buffer, 0, n);
                 HttpRequest request = new HttpRequest(rawRequest);
                 request.info(true);
-                server.getDispatcher().execute(request, out);
+                server.getDispatcher().execute(request, out, server.getProductRepository());
             }
         } catch (IOException e) {
             e.printStackTrace();
